@@ -4,7 +4,13 @@
  */
 package roig.view;
 
-import java.awt.BorderLayout;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 /**
  *
@@ -16,8 +22,36 @@ public class LoginDialog extends javax.swing.JDialog {
      * Creates new form LoginDialog
      */
     public LoginDialog(java.awt.Frame parent, boolean modal) {
-        super(parent,"FITFORCE LOGIN", modal);
+        super(parent, "FITFORCE LOGIN", modal);
         initComponents();
+        // Agregar DESPUÉS del initComponents()
+        cambiarOpacidadImagen(lblOpacityTitle, 0.8f);
+        cambiarOpacidadImagen(lblTextFieldsOpacity, 0.8f);
+    }
+
+    public void cambiarOpacidadImagen(JLabel label, float opacidad) {
+        // Obtener la imagen original del JLabel
+        ImageIcon iconoOriginal = (ImageIcon) label.getIcon();
+        if (iconoOriginal == null) {
+            return;
+        }
+
+        Image imgOriginal = iconoOriginal.getImage();
+
+        // Crear nueva imagen con transparencia
+        BufferedImage nuevaImagen = new BufferedImage(
+                imgOriginal.getWidth(null),
+                imgOriginal.getHeight(null),
+                BufferedImage.TYPE_INT_ARGB);
+
+        // Aplicar la transparencia
+        Graphics2D g = nuevaImagen.createGraphics();
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacidad));
+        g.drawImage(imgOriginal, 0, 0, null);
+        g.dispose();
+
+        // Establecer la nueva imagen en el label
+        label.setIcon(new ImageIcon(nuevaImagen));
     }
 
     /**
@@ -35,36 +69,38 @@ public class LoginDialog extends javax.swing.JDialog {
         txtLoginName = new javax.swing.JTextField();
         txtLoginPassword = new javax.swing.JTextField();
         btnLogin = new javax.swing.JButton();
+        lblTextFieldsOpacity = new javax.swing.JLabel();
+        lblOpacityTitle = new javax.swing.JLabel();
         lblLoginFrame = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("FITFORCE LOGIN");
         setBackground(new java.awt.Color(0, 0, 0));
-        setMaximumSize(new java.awt.Dimension(800, 1200));
-        setMinimumSize(new java.awt.Dimension(400, 600));
-        setSize(new java.awt.Dimension(0, 0));
+        setPreferredSize(new java.awt.Dimension(445, 674));
+        setResizable(false);
+        setSize(new java.awt.Dimension(455, 674));
         getContentPane().setLayout(null);
 
         lblTItleLogin.setFont(new java.awt.Font("SansSerif", 1, 24)); // NOI18N
         lblTItleLogin.setForeground(new java.awt.Color(255, 215, 0));
         lblTItleLogin.setText("FITFORCE LOGIN");
         getContentPane().add(lblTItleLogin);
-        lblTItleLogin.setBounds(100, 140, 210, 60);
+        lblTItleLogin.setBounds(120, 180, 210, 60);
 
         lblSubTitleLogin.setFont(new java.awt.Font("SansSerif", 0, 16)); // NOI18N
         lblSubTitleLogin.setForeground(new java.awt.Color(255, 215, 0));
         lblSubTitleLogin.setText("AS A MEMBER OR INSTRUCTOR");
         getContentPane().add(lblSubTitleLogin);
-        lblSubTitleLogin.setBounds(80, 190, 250, 30);
+        lblSubTitleLogin.setBounds(100, 220, 250, 30);
 
-        pnlForm.setBackground(new java.awt.Color(255, 250, 205));
-        pnlForm.setForeground(new java.awt.Color(255, 250, 205));
+        pnlForm.setBackground(new java.awt.Color(0, 0, 0));
         pnlForm.setMinimumSize(new java.awt.Dimension(300, 200));
+        pnlForm.setOpaque(false);
         pnlForm.setLayout(null);
 
         txtLoginName.setText("Password...");
         pnlForm.add(txtLoginName);
-        txtLoginName.setBounds(20, 70, 260, 26);
+        txtLoginName.setBounds(20, 60, 260, 26);
 
         txtLoginPassword.setText("Name...");
         txtLoginPassword.addActionListener(new java.awt.event.ActionListener() {
@@ -73,7 +109,10 @@ public class LoginDialog extends javax.swing.JDialog {
             }
         });
         pnlForm.add(txtLoginPassword);
-        txtLoginPassword.setBounds(20, 30, 260, 26);
+        txtLoginPassword.setBounds(20, 15, 260, 26);
+
+        getContentPane().add(pnlForm);
+        pnlForm.setBounds(80, 440, 300, 100);
 
         btnLogin.setBackground(new java.awt.Color(255, 215, 0));
         btnLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/loginResized.png"))); // NOI18N
@@ -82,15 +121,20 @@ public class LoginDialog extends javax.swing.JDialog {
                 btnLoginActionPerformed(evt);
             }
         });
-        pnlForm.add(btnLogin);
-        btnLogin.setBounds(100, 110, 100, 60);
+        getContentPane().add(btnLogin);
+        btnLogin.setBounds(170, 560, 100, 60);
 
-        getContentPane().add(pnlForm);
-        pnlForm.setBounds(50, 270, 300, 200);
+        lblTextFieldsOpacity.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/textFields_opacity.png"))); // NOI18N
+        getContentPane().add(lblTextFieldsOpacity);
+        lblTextFieldsOpacity.setBounds(70, 430, 320, 120);
 
-        lblLoginFrame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/cuadro_flores_login_2_RESIZED.png"))); // NOI18N
+        lblOpacityTitle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/Background.png"))); // NOI18N
+        getContentPane().add(lblOpacityTitle);
+        lblOpacityTitle.setBounds(80, 150, 290, 150);
+
+        lblLoginFrame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/TEST.png"))); // NOI18N
         getContentPane().add(lblLoginFrame);
-        lblLoginFrame.setBounds(-27, -40, 480, 640);
+        lblLoginFrame.setBounds(0, 0, 450, 660);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -148,8 +192,10 @@ public class LoginDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogin;
     private javax.swing.JLabel lblLoginFrame;
+    private javax.swing.JLabel lblOpacityTitle;
     private javax.swing.JLabel lblSubTitleLogin;
     private javax.swing.JLabel lblTItleLogin;
+    private javax.swing.JLabel lblTextFieldsOpacity;
     private javax.swing.JPanel pnlForm;
     private javax.swing.JTextField txtLoginName;
     private javax.swing.JTextField txtLoginPassword;
