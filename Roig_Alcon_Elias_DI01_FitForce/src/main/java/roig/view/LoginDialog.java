@@ -4,13 +4,20 @@
  */
 package roig.view;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
+import com.sun.source.tree.ParenthesizedTree;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import roig.dto.Usuari;
+import roig.model.DataAccess;
+import roig.utils.UIUtils;
 
 /**
  *
@@ -27,6 +34,8 @@ public class LoginDialog extends javax.swing.JDialog {
         // Agregar DESPUÉS del initComponents()
         cambiarOpacidadImagen(lblOpacityTitle, 0.8f);
         cambiarOpacidadImagen(lblTextFieldsOpacity, 0.8f);
+        UIUtils.addHoverEffect(btnLogin, Color.WHITE, 10); // Aura blanca con grosor 10
+        UIUtils.addHoverEffect(btnSignIn, Color.WHITE, 10);     // Aura blanca con grosor 10
     }
 
     public void cambiarOpacidadImagen(JLabel label, float opacidad) {
@@ -65,10 +74,12 @@ public class LoginDialog extends javax.swing.JDialog {
 
         lblTItleLogin = new javax.swing.JLabel();
         lblSubTitleLogin = new javax.swing.JLabel();
+        lblUserIcon = new javax.swing.JLabel();
         pnlForm = new javax.swing.JPanel();
-        txtLoginName = new javax.swing.JTextField();
-        txtLoginPassword = new javax.swing.JTextField();
+        txtLoginEmail = new javax.swing.JTextField();
+        txtLoginPassword = new javax.swing.JPasswordField();
         btnLogin = new javax.swing.JButton();
+        btnSignIn = new javax.swing.JButton();
         lblTextFieldsOpacity = new javax.swing.JLabel();
         lblOpacityTitle = new javax.swing.JLabel();
         lblLoginFrame = new javax.swing.JLabel();
@@ -93,23 +104,27 @@ public class LoginDialog extends javax.swing.JDialog {
         getContentPane().add(lblSubTitleLogin);
         lblSubTitleLogin.setBounds(100, 220, 250, 30);
 
+        lblUserIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/user_registration_icon_RESIZED.png"))); // NOI18N
+        getContentPane().add(lblUserIcon);
+        lblUserIcon.setBounds(185, 300, 80, 80);
+
         pnlForm.setBackground(new java.awt.Color(0, 0, 0));
         pnlForm.setMinimumSize(new java.awt.Dimension(300, 200));
         pnlForm.setOpaque(false);
         pnlForm.setLayout(null);
 
-        txtLoginName.setText("Password...");
-        pnlForm.add(txtLoginName);
-        txtLoginName.setBounds(20, 60, 260, 26);
-
-        txtLoginPassword.setText("Name...");
-        txtLoginPassword.addActionListener(new java.awt.event.ActionListener() {
+        txtLoginEmail.setText("Name...");
+        txtLoginEmail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtLoginPasswordActionPerformed(evt);
+                txtLoginEmailActionPerformed(evt);
             }
         });
+        pnlForm.add(txtLoginEmail);
+        txtLoginEmail.setBounds(20, 15, 260, 26);
+
+        txtLoginPassword.setText("jPasswordField1");
         pnlForm.add(txtLoginPassword);
-        txtLoginPassword.setBounds(20, 15, 260, 26);
+        txtLoginPassword.setBounds(20, 60, 260, 26);
 
         getContentPane().add(pnlForm);
         pnlForm.setBounds(80, 440, 300, 100);
@@ -122,7 +137,17 @@ public class LoginDialog extends javax.swing.JDialog {
             }
         });
         getContentPane().add(btnLogin);
-        btnLogin.setBounds(170, 560, 100, 60);
+        btnLogin.setBounds(120, 560, 100, 65);
+
+        btnSignIn.setBackground(new java.awt.Color(255, 215, 0));
+        btnSignIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/sign_in_RESIZED.png"))); // NOI18N
+        btnSignIn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSignInActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnSignIn);
+        btnSignIn.setBounds(230, 560, 100, 65);
 
         lblTextFieldsOpacity.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/textFields_opacity.png"))); // NOI18N
         getContentPane().add(lblTextFieldsOpacity);
@@ -130,7 +155,7 @@ public class LoginDialog extends javax.swing.JDialog {
 
         lblOpacityTitle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/Background.png"))); // NOI18N
         getContentPane().add(lblOpacityTitle);
-        lblOpacityTitle.setBounds(80, 150, 290, 150);
+        lblOpacityTitle.setBounds(80, 180, 290, 90);
 
         lblLoginFrame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/TEST.png"))); // NOI18N
         getContentPane().add(lblLoginFrame);
@@ -139,13 +164,31 @@ public class LoginDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtLoginPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLoginPasswordActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtLoginPasswordActionPerformed
-
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        // TODO add your handling code here:
+        DataAccess da = new DataAccess();
+        char[] password = txtLoginPassword.getPassword();
+        Usuari usuari = da.validateUser(txtLoginEmail.getText(), password);
+        Arrays.fill(password, '\0'); // Limpia el arreglo de contraseñas
+
+        if (usuari != null) {
+            JOptionPane.showMessageDialog(this, "Login successful: Welcome " + usuari.getNom());
+            this.dispose(); // Cierra el diálogo de inicio de sesión
+            MainJFrame mainFrame = new MainJFrame();
+            mainFrame.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Error: Invalid email or password", "Login Failed", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnLoginActionPerformed
+
+    private void btnSignInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignInActionPerformed
+        // Crear y mostrar el diálogo de registro
+        RegisterDialog registerDialog = new RegisterDialog(this, true); // Pasar "this" como parent
+        registerDialog.setVisible(true);
+    }//GEN-LAST:event_btnSignInActionPerformed
+
+    private void txtLoginEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLoginEmailActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtLoginEmailActionPerformed
 
     /**
      * @param args the command line arguments
@@ -191,13 +234,15 @@ public class LoginDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogin;
+    private javax.swing.JButton btnSignIn;
     private javax.swing.JLabel lblLoginFrame;
     private javax.swing.JLabel lblOpacityTitle;
     private javax.swing.JLabel lblSubTitleLogin;
     private javax.swing.JLabel lblTItleLogin;
     private javax.swing.JLabel lblTextFieldsOpacity;
+    private javax.swing.JLabel lblUserIcon;
     private javax.swing.JPanel pnlForm;
-    private javax.swing.JTextField txtLoginName;
-    private javax.swing.JTextField txtLoginPassword;
+    private javax.swing.JTextField txtLoginEmail;
+    private javax.swing.JPasswordField txtLoginPassword;
     // End of variables declaration//GEN-END:variables
 }

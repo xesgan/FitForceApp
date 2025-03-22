@@ -1,5 +1,6 @@
 package roig.model;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -53,6 +54,18 @@ public class DataAccess {
             Logger.getLogger(DataAccess.class.getName()).log(Level.SEVERE, null, ex);
         }
         return usuaris;
+    }
+
+    public Usuari validateUser(String email, char[] password) {
+        Usuari usuari = getUsuarisEmail(email);
+        if (usuari != null) {
+            String userPasswordHash = usuari.getPasswordHash();
+            var result = BCrypt.verifyer().verify(password, userPasswordHash);
+            if (result.verified) {
+                return usuari; // Usuario válido
+            }
+        }
+        return null; // Usuario no válido o no encontrado
     }
 
     public int registerUser(Usuari u) {
