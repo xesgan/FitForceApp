@@ -11,10 +11,12 @@ roig\view\RegisterDialog$4.class
 roig\utils\UIUtils.class
 roig\view\MainJFrameTest$4.class
 roig\view\MainJFrame$2.class
+roig\utils\PlaceHolder.class
 roig\view\MainJFrame.class
 roig\view\MainJFrameTest$7.class
 roig\view\RegisterDialog$5.class
 roig\view\LoginDialog$2.class
+roig\utils\PlaceHolder$1.class
 roig\view\MainJFrameTest$3.class
 roig\view\RegisterDialog$1.class
 roig\view\LoginDialog.class

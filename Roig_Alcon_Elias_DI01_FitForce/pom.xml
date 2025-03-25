@@ -31,5 +31,10 @@
             <artifactId>bcrypt</artifactId>
             <version>0.10.2</version>
         </dependency>
+        <dependency>
+            <groupId>adf05</groupId>
+            <artifactId>Roig_Alcon_Elias_AD05_Tarea</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

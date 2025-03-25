@@ -17,8 +17,10 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import roig.dto.Usuari;
 import roig.utils.UIUtils;
 import roig.model.DataAccess;
+import roig.utils.PlaceHolder;
 
 /**
  *
@@ -32,37 +34,21 @@ public class RegisterDialog extends javax.swing.JDialog {
     public RegisterDialog(java.awt.Window parent, boolean modal) {
         super(parent, "INSTRUCTOR REGISTER", modal ? ModalityType.APPLICATION_MODAL : ModalityType.MODELESS);
         initComponents();
-        setLocationRelativeTo(parent); // Centrar el diálogo en la ventana principal
-        // Agregar DESPUÉS del initComponents()
-        cambiarOpacidadImagen(lblOpacityTitle, 0.8f);
-        cambiarOpacidadImagen(lblTextFieldsOpacity, 0.8f);
+
+        // Centrar el diálogo en la ventana principal
+        setLocationRelativeTo(parent);
+
+        // Cambiar Opacidad de las imagenes
+        UIUtils.cambiarOpacidadImagen(lblOpacityTitle, 0.8f);
+        UIUtils.cambiarOpacidadImagen(lblTextFieldsOpacity, 0.8f);
+
+        // Hovers para Botones
         UIUtils.addHoverEffect(btnSignCancel, Color.WHITE, 10); // Aura blanca con grosor 10
         UIUtils.addHoverEffect(btnSignIn, Color.WHITE, 10);     // Aura blanca con grosor 10
-    }
 
-    public void cambiarOpacidadImagen(JLabel label, float opacidad) {
-        // Obtener la imagen original del JLabel
-        ImageIcon iconoOriginal = (ImageIcon) label.getIcon();
-        if (iconoOriginal == null) {
-            return;
-        }
-
-        Image imgOriginal = iconoOriginal.getImage();
-
-        // Crear nueva imagen con transparencia
-        BufferedImage nuevaImagen = new BufferedImage(
-                imgOriginal.getWidth(null),
-                imgOriginal.getHeight(null),
-                BufferedImage.TYPE_INT_ARGB);
-
-        // Aplicar la transparencia
-        Graphics2D g = nuevaImagen.createGraphics();
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacidad));
-        g.drawImage(imgOriginal, 0, 0, null);
-        g.dispose();
-
-        // Establecer la nueva imagen en el label
-        label.setIcon(new ImageIcon(nuevaImagen));
+        // PlaceHolders 
+        PlaceHolder.addPlaceholder(txtRegisterName, "Name...");
+        PlaceHolder.addPlaceholder(txtRegisterEmail, "Email...");
     }
 
     /**
@@ -77,10 +63,13 @@ public class RegisterDialog extends javax.swing.JDialog {
         lblTItleLogin = new javax.swing.JLabel();
         lblSubTitleLogin = new javax.swing.JLabel();
         pnlForm = new javax.swing.JPanel();
-        txtLoginName = new javax.swing.JTextField();
-        txtLoginEmail = new javax.swing.JTextField();
-        txtLoginPassword = new javax.swing.JPasswordField();
-        txtLoginPasswordConfirm = new javax.swing.JPasswordField();
+        txtRegisterName = new javax.swing.JTextField();
+        txtRegisterEmail = new javax.swing.JTextField();
+        txtRegisterPassword = new javax.swing.JPasswordField();
+        txtRegisterPasswordConfirm = new javax.swing.JPasswordField();
+        chkIsInstructor = new javax.swing.JCheckBox();
+        lblPassword = new javax.swing.JLabel();
+        lblConfirmPassword = new javax.swing.JLabel();
         btnSignCancel = new javax.swing.JButton();
         btnSignIn = new javax.swing.JButton();
         lblUserIcon = new javax.swing.JLabel();
@@ -100,47 +89,62 @@ public class RegisterDialog extends javax.swing.JDialog {
         lblTItleLogin.setForeground(new java.awt.Color(255, 215, 0));
         lblTItleLogin.setText("INSTRUCTOR");
         getContentPane().add(lblTItleLogin);
-        lblTItleLogin.setBounds(148, 180, 160, 60);
+        lblTItleLogin.setBounds(148, 125, 160, 60);
 
         lblSubTitleLogin.setFont(new java.awt.Font("SansSerif", 0, 16)); // NOI18N
         lblSubTitleLogin.setForeground(new java.awt.Color(255, 215, 0));
         lblSubTitleLogin.setText("REGISTRATION");
         getContentPane().add(lblSubTitleLogin);
-        lblSubTitleLogin.setBounds(165, 220, 120, 30);
+        lblSubTitleLogin.setBounds(165, 165, 120, 30);
 
         pnlForm.setBackground(new java.awt.Color(0, 0, 0));
         pnlForm.setMinimumSize(new java.awt.Dimension(300, 200));
         pnlForm.setOpaque(false);
         pnlForm.setLayout(null);
 
-        txtLoginName.setText("Name...");
-        txtLoginName.addActionListener(new java.awt.event.ActionListener() {
+        txtRegisterName.setText("Name...");
+        txtRegisterName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtLoginNameActionPerformed(evt);
+                txtRegisterNameActionPerformed(evt);
             }
         });
-        pnlForm.add(txtLoginName);
-        txtLoginName.setBounds(20, 59, 260, 26);
+        pnlForm.add(txtRegisterName);
+        txtRegisterName.setBounds(20, 10, 260, 26);
 
-        txtLoginEmail.setText("Email....");
-        txtLoginEmail.addActionListener(new java.awt.event.ActionListener() {
+        txtRegisterEmail.setText("Email....");
+        txtRegisterEmail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtLoginEmailActionPerformed(evt);
+                txtRegisterEmailActionPerformed(evt);
             }
         });
-        pnlForm.add(txtLoginEmail);
-        txtLoginEmail.setBounds(20, 92, 260, 26);
+        pnlForm.add(txtRegisterEmail);
+        txtRegisterEmail.setBounds(20, 47, 260, 26);
+        pnlForm.add(txtRegisterPassword);
+        txtRegisterPassword.setBounds(20, 100, 260, 26);
+        pnlForm.add(txtRegisterPasswordConfirm);
+        txtRegisterPasswordConfirm.setBounds(20, 150, 260, 26);
 
-        txtLoginPassword.setText("jPasswordField1");
-        pnlForm.add(txtLoginPassword);
-        txtLoginPassword.setBounds(20, 125, 260, 26);
+        chkIsInstructor.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        chkIsInstructor.setForeground(new java.awt.Color(255, 255, 255));
+        chkIsInstructor.setText("Are you instructor?");
+        chkIsInstructor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkIsInstructorActionPerformed(evt);
+            }
+        });
+        pnlForm.add(chkIsInstructor);
+        chkIsInstructor.setBounds(40, 185, 130, 20);
 
-        txtLoginPasswordConfirm.setText("jPasswordField1");
-        pnlForm.add(txtLoginPasswordConfirm);
-        txtLoginPasswordConfirm.setBounds(20, 160, 260, 26);
+        lblPassword.setText("Password");
+        pnlForm.add(lblPassword);
+        lblPassword.setBounds(25, 80, 50, 16);
+
+        lblConfirmPassword.setText("Confirm Password");
+        pnlForm.add(lblConfirmPassword);
+        lblConfirmPassword.setBounds(25, 130, 97, 16);
 
         getContentPane().add(pnlForm);
-        pnlForm.setBounds(80, 352, 300, 190);
+        pnlForm.setBounds(80, 322, 300, 220);
 
         btnSignCancel.setBackground(new java.awt.Color(255, 215, 0));
         btnSignCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/cancel_registratios_RESIZED.png"))); // NOI18N
@@ -164,15 +168,15 @@ public class RegisterDialog extends javax.swing.JDialog {
 
         lblUserIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/user_registration_icon_RESIZED.png"))); // NOI18N
         getContentPane().add(lblUserIcon);
-        lblUserIcon.setBounds(185, 300, 80, 80);
+        lblUserIcon.setBounds(185, 225, 80, 80);
 
         lblTextFieldsOpacity.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/textFields_Register_opacity.png"))); // NOI18N
         getContentPane().add(lblTextFieldsOpacity);
-        lblTextFieldsOpacity.setBounds(70, 397, 320, 155);
+        lblTextFieldsOpacity.setBounds(70, 302, 320, 250);
 
         lblOpacityTitle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/Background.png"))); // NOI18N
         getContentPane().add(lblOpacityTitle);
-        lblOpacityTitle.setBounds(80, 175, 290, 90);
+        lblOpacityTitle.setBounds(80, 120, 290, 90);
 
         lblLoginFrame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/TEST.png"))); // NOI18N
         getContentPane().add(lblLoginFrame);
@@ -185,30 +189,60 @@ public class RegisterDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnSignCancelActionPerformed
 
-    private void txtLoginEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLoginEmailActionPerformed
+    private void txtRegisterEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRegisterEmailActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtLoginEmailActionPerformed
+    }//GEN-LAST:event_txtRegisterEmailActionPerformed
 
-    private void txtLoginNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLoginNameActionPerformed
+    private void txtRegisterNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRegisterNameActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtLoginNameActionPerformed
+    }//GEN-LAST:event_txtRegisterNameActionPerformed
 
     private void btnSignInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignInActionPerformed
-        // TODO add your handling code here:
-        btnSignIn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                btnSignIn.setBackground(Color.WHITE);
-                btnSignIn.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
-            }
+        // Verificamos que haya clicado que es instructor primero 
+        // porque no tenemos manera de contactar con el usuario y mandar una verificacion
+        if (!chkIsInstructor.isSelected()) {
+            JOptionPane.showMessageDialog(btnSignIn, "You must be an Instructor to register!", "ERROR", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                btnSignIn.setBackground(Color.YELLOW);
-                btnSignIn.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-            }
-        });
+        // Crear un nuevo usuario
+        Usuari nouUsuari = new Usuari();
+        nouUsuari.setNom(txtRegisterName.getText());
+        nouUsuari.setEmail(txtRegisterEmail.getText());
+
+        // Verificar si las contraseñas coinciden
+        if (!String.valueOf(txtRegisterPassword.getPassword()).equals(String.valueOf(txtRegisterPasswordConfirm.getPassword()))) {
+            JOptionPane.showMessageDialog(btnSignIn, "Passwords do not match!", "ERROR", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Hash de la contraseña usando BCrypt
+        String passwordHash = BCrypt.withDefaults().hashToString(12, txtRegisterPassword.getPassword());
+        nouUsuari.setPasswordHash(passwordHash);
+        nouUsuari.setInstructor(chkIsInstructor.isSelected());
+
+        // Acceso a la base de datos
+        DataAccess da = new DataAccess();
+
+        // Verificar si el usuario ya existe
+        if (da.userExists(nouUsuari.getEmail())) {
+            JOptionPane.showMessageDialog(btnSignIn, "A user with this email already exists!", "ERROR", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Registrar el nuevo usuario
+        int nouUsuariId = da.registerUser(nouUsuari);
+        if (nouUsuariId > 0) {
+            nouUsuari.setId(nouUsuariId);
+            JOptionPane.showMessageDialog(btnSignIn, "User registered successfully with ID: " + nouUsuariId, "INFORMATION", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(btnSignIn, "Error registering user!", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSignInActionPerformed
+
+    private void chkIsInstructorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkIsInstructorActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkIsInstructorActionPerformed
 
     /**
      * @param args the command line arguments
@@ -256,16 +290,19 @@ public class RegisterDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSignCancel;
     private javax.swing.JButton btnSignIn;
+    private javax.swing.JCheckBox chkIsInstructor;
+    private javax.swing.JLabel lblConfirmPassword;
     private javax.swing.JLabel lblLoginFrame;
     private javax.swing.JLabel lblOpacityTitle;
+    private javax.swing.JLabel lblPassword;
     private javax.swing.JLabel lblSubTitleLogin;
     private javax.swing.JLabel lblTItleLogin;
     private javax.swing.JLabel lblTextFieldsOpacity;
     private javax.swing.JLabel lblUserIcon;
     private javax.swing.JPanel pnlForm;
-    private javax.swing.JTextField txtLoginEmail;
-    private javax.swing.JTextField txtLoginName;
-    private javax.swing.JPasswordField txtLoginPassword;
-    private javax.swing.JPasswordField txtLoginPasswordConfirm;
+    private javax.swing.JTextField txtRegisterEmail;
+    private javax.swing.JTextField txtRegisterName;
+    private javax.swing.JPasswordField txtRegisterPassword;
+    private javax.swing.JPasswordField txtRegisterPasswordConfirm;
     // End of variables declaration//GEN-END:variables
 }

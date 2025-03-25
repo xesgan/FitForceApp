@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,43 +69,56 @@ public class DataAccess {
         return null; // Usuario no válido o no encontrado
     }
 
-    public int registerUser(Usuari u) {
-        int newUserId = 0;
-        Connection con = getConnection();
-        String sql = "INSERT INTO Usuaris(Nom, Email, PasswordHash, Instructor) "
-                + " VALUES (?,?,?,?)";
+    public int registerUser(Usuari user) {
+        int userId = -1;
+        String query = "INSERT INTO Usuaris (nom, email, passwordHash, Instructor) VALUES (?, ?, ?, ?)";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, user.getNom());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getPasswordHash());
+            stmt.setBoolean(4, user.isInstructor());
+            int rowsAffected = stmt.executeUpdate();
 
-        try {
-            PreparedStatement insertStatement = con.prepareStatement(sql);
-            insertStatement.setString(1, u.getNom());
-            insertStatement.setString(2, u.getEmail());
-            insertStatement.setString(3, u.getPasswordHash());
-            insertStatement.setBoolean(4, u.isInstructor());
-            newUserId = insertStatement.executeUpdate();
-            insertStatement.close();
-            con.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(DataAccess.class.getName()).log(Level.SEVERE, null, ex);
+            if (rowsAffected > 0) {
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        userId = rs.getInt(1); // Obtener el ID generado
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return 0;
+        return userId; // Devuelve el ID del usuario o -1 si hubo un error
     }
 
     public int getLastInsertUserId() {
-        String sql = "SELECT MAX(Id) FROM Usuaris";
-        int userId = 0;
-        Connection con = getConnection();
-        try {
-            PreparedStatement selectStatement = con.prepareStatement(sql);
-            ResultSet rs = selectStatement.executeQuery();
-            while (rs.next()) {
-                userId = rs.getInt(1);
+        int userId = -1;
+        String query = "SELECT SCOPE_IDENTITY() AS lastId"; // Para MS SQL Server
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                userId = rs.getInt("lastId");
             }
-            selectStatement.close();
-            con.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(DataAccess.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return userId;
+    }
+
+    public boolean userExists(String email) {
+        boolean exists = false;
+        String query = "SELECT COUNT(*) FROM Usuaris WHERE email = ?";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, email);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    exists = rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return exists;
     }
 
     public Usuari getUsuarisEmail(String email) {
